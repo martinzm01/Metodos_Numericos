@@ -1,5 +1,7 @@
 import ttkbootstrap as tb
 from tkinter import font
+
+
 ventana=tb.Window(themename="vapor")
 ventana.geometry("1200x900")
 ##Marco de titulo
@@ -35,35 +37,55 @@ frame_Entrada=tb.LabelFrame(ventana,bootstyle="light",text="Datos de Entrada",st
 frame_Entrada.pack(pady=(10,10))
     ###Label de la funcion
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="f(x)").grid(row=0,column=0)
-entrada_funcion=tb.Entry(frame_Entrada,width=40).grid(row=0,column=1,padx=10)
+entrada_funcion=tb.Entry(frame_Entrada,width=40)
+entrada_funcion.grid(row=0,column=1,padx=10)
     
     ###Label de los parametros
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="A").grid(row=1,column=0)
-entrada_a=tb.Entry(frame_Entrada,width=40).grid(row=1,column=1,padx=10)
+entrada_a=tb.Entry(frame_Entrada,width=40)
+entrada_a.grid(row=1,column=1,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="B").grid(row=2,column=0)
-entrada_b=tb.Entry(frame_Entrada,width=40).grid(row=2,column=1,padx=10)
+entrada_b=tb.Entry(frame_Entrada,width=40)
+entrada_b.grid(row=2,column=1,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="X0").grid(row=3,column=0)
-entrada_x0=tb.Entry(frame_Entrada,width=40).grid(row=3,column=1,padx=10)
+entrada_x0=tb.Entry(frame_Entrada,width=40)
+entrada_x0.grid(row=3,column=1,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="X1").grid(row=4,column=0)
-entrada_x1=tb.Entry(frame_Entrada,width=40).grid(row=4,column=1,padx=10)
+entrada_x1=tb.Entry(frame_Entrada,width=40)
+entrada_x1.grid(row=4,column=1,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="X1").grid(row=1,column=2)
-entrada_tol=tb.Entry(frame_Entrada,width=40).grid(row=1,column=3,padx=10)
+entrada_tol=tb.Entry(frame_Entrada,width=40)
+entrada_tol.grid(row=1,column=3,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="X1").grid(row=2,column=2)
-entrada_max_iter=tb.Entry(frame_Entrada,width=40).grid(row=2,column=3,padx=10)
+entrada_max_iter=tb.Entry(frame_Entrada,width=40)
+entrada_max_iter.grid(row=2,column=3,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="X1").grid(row=0,column=2)
-entrada_tol=tb.Entry(frame_Entrada,width=40).grid(row=0,column=3,padx=10)
+entrada_tol=tb.Entry(frame_Entrada,width=40)
+entrada_tol.grid(row=0,column=3,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="X1").grid(row=3,column=2)
-entrada_max_iter=tb.Entry(frame_Entrada,width=40).grid(row=3,column=3,padx=10)
+entrada_max_iter=tb.Entry(frame_Entrada,width=40)
+entrada_max_iter.grid(row=3,column=3,padx=10)
 
 tb.Label(frame_Entrada,font=("Segoe UI",14),text="X1").grid(row=4,column=2)
-entrada_max_iter=tb.Entry(frame_Entrada,width=40).grid(row=4,column=3,padx=10)
+entrada_max_iter=tb.Entry(frame_Entrada,width=40)
+entrada_max_iter.grid(row=4,column=3,padx=10)
+
+## funcion para limpiar
+
+def limpiar_entradas():
+    entradas = [
+        entrada_funcion, entrada_a, entrada_b,
+        entrada_x0, entrada_x1, entrada_tol, entrada_max_iter
+    ]
+    for e in entradas:
+        e.delete(0, 'end')
 
 #####FRAME PARA Botones Calcular y limpiar
 frame_calc_limp=tb.Frame(ventana,width=1050)
@@ -71,7 +93,7 @@ frame_calc_limp.pack(pady=20)
     ##boton Calcular
 tb.Button(frame_calc_limp,text="CALCULAR",width=30).pack(padx=50,side="left")
     ##boton limpiar
-tb.Button(frame_calc_limp,text="LIMPIAR",width=30).pack(padx=50,side="left")
+tb.Button(frame_calc_limp, text="LIMPIAR", width=30, command=limpiar_entradas).pack(padx=50,side="left")
 
 ###Marco de Resultados
 
@@ -88,4 +110,7 @@ tb.Label(frame_resultados,text="Historial: ",width=95,font=("Segoe UI",12)).pack
 
 
 
+
 ventana.mainloop()
+
+
