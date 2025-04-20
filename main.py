@@ -26,12 +26,12 @@ frame_metodos=tb.LabelFrame(ventana,bootstyle="dark",text="SELECCIONA EL MÉTODO
 frame_metodos.pack(pady=(10,10))
 
 
-tb.Button(frame_metodos,width=60,text="BISECCION",bootstyle="default").grid(row=1,column=0,pady=10,padx=20)
-tb.Button(frame_metodos,width=60,text="NEWTON",bootstyle="warning").grid(row=1,column=1, pady=10)
-tb.Button(frame_metodos,width=60,text="REGULA FALSI",bootstyle="info").grid(row=2,column=0,padx=20,pady=10)
-tb.Button(frame_metodos,width=60,text="JACOBI",bootstyle="secondary").grid(row=2,column=1,padx=10,pady=(10))
-tb.Button(frame_metodos,width=60,text="SECANTE",bootstyle="success").grid(row=3,column=0,padx=20,pady=(10,20))
-tb.Button(frame_metodos,width=60,text="GAUSS-JORDAN",bootstyle="danger").grid(row=3,column=1,padx=10,pady=(10,20))
+tb.Button(frame_metodos,width=60,text="BISECCION",bootstyle="default", command=lambda: mostrar_campos_para_metodo("Biseccion")).grid(row=1,column=0,pady=10,padx=20)
+tb.Button(frame_metodos,width=60,text="NEWTON",bootstyle="warning", command=lambda: mostrar_campos_para_metodo("Newton")).grid(row=1,column=1, pady=10)
+tb.Button(frame_metodos,width=60,text="REGULA FALSI",bootstyle="info", command=lambda: mostrar_campos_para_metodo("Regula Falsi")).grid(row=2,column=0,padx=20,pady=10)
+tb.Button(frame_metodos,width=60,text="JACOBI",bootstyle="secondary", command=lambda: mostrar_campos_para_metodo("Jacobi")).grid(row=2,column=1,padx=10,pady=(10))
+tb.Button(frame_metodos,width=60,text="SECANTE",bootstyle="success", command=lambda: mostrar_campos_para_metodo("Secante")).grid(row=3,column=0,padx=20,pady=(10,20))
+tb.Button(frame_metodos,width=60,text="GAUSS-JORDAN",bootstyle="danger", command=lambda: mostrar_campos_para_metodo("Gauss-Jordan")).grid(row=3,column=1,padx=10,pady=(10,20))
 
 ####### FRAME de DATOS DE ENTRADA
 frame_Entrada=tb.LabelFrame(ventana,bootstyle="light",text="Datos de Entrada",style="Custom.TLabelframe",padding=(0,10,0,0,))
@@ -96,6 +96,7 @@ tb.Label(frame_Entrada,font=("Segoe UI",14),width=15).grid(row=4,column=2,pady=0
 tb.Label(frame_Entrada,font=("Segoe UI",14),width=15).grid(row=5,column=2,pady=0)
 tb.Label(frame_Entrada,font=("Segoe UI",14),width=15).grid(row=6,column=2,pady=0)
 
+
             ####   METODOS Y FUNCIONES  ######
 def limpiar_entradas():
     entradas = [
@@ -104,7 +105,6 @@ def limpiar_entradas():
     ]
     for e in entradas:
         e.delete(0, 'end')
-
 
 #####FRAME PARA Botones Calcular y limpiar
 frame_calc_limp=tb.Frame(ventana,width=1050)
@@ -129,9 +129,57 @@ tb.Label(frame_resultados,text="Iteraciones: ",width=95,font=("Segoe UI",12)).pa
 tb.Label(frame_resultados,text="Historial: ",width=95,font=("Segoe UI",12)).pack(pady=10,padx=10)
 
 
+def mostrar_campos_para_metodo(metodo):
+    # Ocultar todas las entradas
+    entradas = [entrada_fun1, entrada_fun2,entrada_fun3,entrada_fun4,entrada_fun5,entrada_fun6, entrada_a, entrada_b, entrada_x0, entrada_x1, entrada_tol, entrada_max_iter]
+    for e in entradas:
+        e.config(state='disabled')
+        e.delete(0, 'end')
 
+    # Mostrar solo los que necesita ese método
+    if metodo == "Biseccion":
+        entrada_fun1.config(state='normal')
+        entrada_a.config(state='normal')
+        entrada_b.config(state='normal')
+        entrada_tol.config(state='normal')
+        entrada_max_iter.config(state='normal')
 
+    elif metodo == "Newton":
+        entrada_fun1.config(state='normal')
+        entrada_fun2.config(state='normal')
+        entrada_fun3.config(state='normal')
+        entrada_fun4.config(state='normal')
+        entrada_fun5.config(state='normal')
+        entrada_fun6.config(state='normal')
+        entrada_x0.config(state='normal')
+        entrada_tol.config(state='normal')
+        entrada_max_iter.config(state='normal')
 
+    elif metodo == "Regula Falsi":
+        entrada_fun1.config(state='normal')
+        entrada_a.config(state='normal')
+        entrada_b.config(state='normal')
+        entrada_tol.config(state='normal')
+        entrada_max_iter.config(state='normal')
+
+    elif metodo == "Jacobi" or metodo == "Gauss-Seidel" or metodo == "Gauss-Jordan":
+        entrada_fun1.config(state='normal')  
+        entrada_fun2.config(state='normal')  
+        entrada_fun3.config(state='normal')  
+        entrada_fun4.config(state='normal')  
+        entrada_fun5.config(state='normal')  
+        entrada_fun6.config(state='normal')  
+        entrada_max_iter.config(state='normal')
+        entrada_tol.config(state='normal')
+        entrada_a.config(state='normal')  
+        entrada_b.config(state='normal') 
+
+    elif metodo=="Secante":
+        entrada_fun1.config(state="normal")
+        entrada_x0.config(state="normal")
+        entrada_x1.config(state="normal")
+        entrada_tol.config(state="normal")
+        entrada_max_iter.config(state="normal")
 """
 Raíces Encontrdas: 
 Iteraciones:
