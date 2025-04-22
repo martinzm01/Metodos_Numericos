@@ -1,20 +1,20 @@
+import math
+from tkinter import messagebox
 import ttkbootstrap as tb
 from tkinter import font
 import math
 import numpy as np
-from methods.bisection import bisection
-from methods.newton import newton
-from methods.regula_falsi import regula_falsi
-from methods.secant import secant
-from methods.gauss_jordan import gauss_jordan
-from methods.jacobi import jacobi
-from methods.gauss_seidel import gauss_seidel
+from metodosnumericos.bisection import bisection
+from metodosnumericos.newton import newton
+from metodosnumericos.secant import secant
+from metodosnumericos.gauss_jordan import gauss_jordan
+from metodosnumericos.regula_falsi import regula_falsi 
+from metodosnumericos.jacobi import jacobi
+
 
 metodo_seleccionado = None
 
     
-
-
 ventana=tb.Window(themename="vapor")
 ventana.geometry("1200x900")
 ##Marco de titulo
@@ -38,12 +38,12 @@ frame_metodos=tb.LabelFrame(ventana,bootstyle="dark",text="SELECCIONA EL MÉTODO
 frame_metodos.pack(pady=(10,10))
 
 
-tb.Button(frame_metodos,width=60,text="BISECCION",bootstyle="default", command=lambda: mostrar_campos_para_metodo("Biseccion")).grid(row=1,column=0,pady=10,padx=20)
-tb.Button(frame_metodos,width=60,text="NEWTON",bootstyle="warning", command=lambda: mostrar_campos_para_metodo("Newton")).grid(row=1,column=1, pady=10)
-tb.Button(frame_metodos,width=60,text="REGULA FALSI",bootstyle="info", command=lambda: mostrar_campos_para_metodo("Regula Falsi")).grid(row=2,column=0,padx=20,pady=10)
-tb.Button(frame_metodos,width=60,text="JACOBI",bootstyle="secondary", command=lambda: mostrar_campos_para_metodo("Jacobi")).grid(row=2,column=1,padx=10,pady=(10))
-tb.Button(frame_metodos,width=60,text="SECANTE",bootstyle="success", command=lambda: mostrar_campos_para_metodo("Secante")).grid(row=3,column=0,padx=20,pady=(10,20))
-tb.Button(frame_metodos,width=60,text="GAUSS-JORDAN",bootstyle="danger", command=lambda: mostrar_campos_para_metodo("Gauss-Jordan")).grid(row=3,column=1,padx=10,pady=(10,20))
+tb.Button(frame_metodos,width=60,text="Biseccion",bootstyle="default", command=lambda: mostrar_campos_para_metodo("Biseccion")).grid(row=1,column=0,pady=10,padx=20)
+tb.Button(frame_metodos,width=60,text="Newton",bootstyle="warning", command=lambda: mostrar_campos_para_metodo("Newton")).grid(row=1,column=1, pady=10)
+tb.Button(frame_metodos,width=60,text="Regula Falsi",bootstyle="info", command=lambda: mostrar_campos_para_metodo("Regula Falsi")).grid(row=2,column=0,padx=20,pady=10)
+tb.Button(frame_metodos,width=60,text="Jacobi",bootstyle="secondary", command=lambda: mostrar_campos_para_metodo("Jacobi")).grid(row=2,column=1,padx=10,pady=(10))
+tb.Button(frame_metodos,width=60,text="Secante",bootstyle="success", command=lambda: mostrar_campos_para_metodo("Secante")).grid(row=3,column=0,padx=20,pady=(10,20))
+tb.Button(frame_metodos,width=60,text="Gauss-Jordan",bootstyle="danger", command=lambda: mostrar_campos_para_metodo("Gauss-Jordan")).grid(row=3,column=1,padx=10,pady=(10,20))
 
 ####### FRAME de DATOS DE ENTRADA
 frame_Entrada=tb.LabelFrame(ventana,bootstyle="light",text="Datos de Entrada",style="Custom.TLabelframe",padding=(0,10,0,0,))
@@ -124,59 +124,93 @@ def calcular_resultado():
         tol = float(entrada_tol.get())
         iter_max = int(entrada_max_iter.get())
 
-        if metodo_seleccionado == "Biseccion":
-            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
-            a = float(entrada_a.get())
-            b = float(entrada_b.get())
-            raiz, iters, hist = bisection(f, a, b, tol, iter_max)
+        # Recolectar todas las entradas de funciones
+        expresiones = [
+            entrada_fun1.get(), entrada_fun2.get(), entrada_fun3.get(),
+            entrada_fun4.get(), entrada_fun5.get(), entrada_fun6.get()
+        ]
+        expresiones = [expr.strip() for expr in expresiones if expr.strip() != ""]
 
-        elif metodo_seleccionado == "Regula Falsi":
-            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
-            a = float(entrada_a.get())
-            b = float(entrada_b.get())
-            raiz, iters, hist = regula_falsi(f, a, b, tol, iter_max)
+        # Verificar que haya al menos una función ingresada
+        if len(expresiones) == 0:
+            raise ValueError("Debe ingresar al menos una función.")
 
-        elif metodo_seleccionado == "Newton":
-            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
-            df = lambda x: eval(entrada_fun2.get())
-            x0 = float(entrada_x0.get())
-            raiz, iters, hist = newton(f, df, x0, tol, iter_max)
+        raiz = None
+        iters = None
+        hist = []
 
-        elif metodo_seleccionado == "Secante":
-            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
-            x0 = float(entrada_x0.get())
-            x1 = float(entrada_x1.get())
-            raiz, iters, hist = secant(f, x0, x1, tol, iter_max)
+        # Métodos que requieren solo UNA función o sistema no lineal
 
-        elif metodo_seleccionado == "Jacobi":
-            A = np.array(eval(entrada_fun1.get()))
-            b = np.array(eval(entrada_fun2.get()))
-            x, iters, hist = jacobi(A, b, tol=tol, max_iter=iter_max)
-            raiz = x
+        if metodo_seleccionado in ["Biseccion", "Regula Falsi", "Newton", "Secante"]:
+            f = lambda x: eval(expresiones[0], {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
+            print("Método seleccionado:", metodo_seleccionado)
+            print("Función ingresada:", expresiones[0])
+            if metodo_seleccionado == "Biseccion":
+                a = float(entrada_a.get())
+                b = float(entrada_b.get())
+                if f(a) * f(b) >= 0:
+                    raise ValueError("La función no cambia de signo en el intervalo [a, b].")
+                raiz, iters, hist = bisection(f, a, b, tol, iter_max)
 
-        elif metodo_seleccionado == "Gauss-Jordan":
-            A = np.array(eval(entrada_fun1.get()))
-            b = np.array(eval(entrada_fun2.get()))
-            x = gauss_jordan(A, b)
-            raiz = x
-            iters = "-"
-            hist = []
+            elif metodo_seleccionado == "Regula Falsi":
+                a = float(entrada_a.get())
+                b = float(entrada_b.get())
+                if f(a) * f(b) >= 0:
+                    raise ValueError("La función no cambia de signo en el intervalo [a, b].")
+                raiz, iters, hist = regula_falsi(f, a, b, tol, iter_max)
 
-        elif metodo_seleccionado == "Gauss-Seidel":
-            A = np.array(eval(entrada_fun1.get()))
-            b = np.array(eval(entrada_fun2.get()))
-            x, iters, hist = gauss_seidel(A, b, tol=tol, max_iter=iter_max)
-            raiz = x
+            elif metodo_seleccionado == "Newton":
+                df = lambda x: eval(entrada_fun2.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
+                x0 = float(entrada_x0.get())
+                raiz, iters, hist = newton(f, df, x0, tol, iter_max)
+
+            elif metodo_seleccionado == "Secante":
+                x0 = float(entrada_x0.get())
+                x1 = float(entrada_x1.get())
+                raiz, iters, hist = secant(f, x0, x1, tol, iter_max)
+            print("Resultado Bisección:")
+            print("Raíz:", raiz)
+            print("Iteraciones:", iters)
+            print("Historial:", hist)
+
+
+        # Métodos que resuelven sistemas lineales (Jacobi, Gauss-Jordan, etc.)
+        elif metodo_seleccionado in ["Jacobi", "Gauss-Jordan", "Gauss-Seidel"]:
+            if len(expresiones) < 2:
+                raise ValueError("Debe ingresar una matriz A y un vector b.")
+
+            A = np.array(eval(expresiones[0]))
+            b = np.array(eval(expresiones[1]))
+
+            if metodo_seleccionado == "Jacobi":
+                x, iters, hist = jacobi(A, b, tol=tol, max_iter=iter_max)
+                raiz = x
+
+            elif metodo_seleccionado == "Gauss-Jordan":
+                x = gauss_jordan(A, b)
+                raiz = x
+                iters = "-"
+                hist = []
 
         # Mostrar resultados
-        print("Raíz encontrada:", raiz)
-        print("Iteraciones:", iters)
-        print("Historial:", hist)
+        label_raiz.config(text=f"Raíz encontrada: {raiz}")
+        label_iters.config(text=f"Iteraciones: {iters}")
+
+        # Mostrar el historial en formato tabular
+        historial_str = "Iter |    a     |    b     |    c     |  f(c)\n"
+        historial_str += "-" * 45 + "\n"
+        for paso in hist:
+            iteracion, a_val, b_val, c_val, fc_val = paso
+            historial_str += f"{iteracion:>4} | {a_val:>7.5f} | {b_val:>7.5f} | {c_val:>7.5f} | {fc_val:>7.5f}\n"
+        
+        # Actualizar el label de historial
+        label_hist.config(text=historial_str)   
 
     except Exception as e:
-        from tkinter import messagebox
+        label_raiz.config(text="Raíz encontrada: ---")
+        label_iters.config(text="Iteraciones: ---")
+        label_hist.config(text="Historial:\n---")
         messagebox.showerror("Error", str(e))
-
 
 #####FRAME PARA Botones Calcular y limpiar
 frame_calc_limp=tb.Frame(ventana,width=1050)
@@ -191,19 +225,21 @@ tb.Button(frame_calc_limp,text="LIMPIAR",width=30,command=limpiar_entradas).pack
 ###Marco de Resultados
 
 frame_resultados=tb.LabelFrame(ventana,bootstyle="light",width=1050,height=200,text="RESULTADOS",style="Custom.TLabelframe")
-frame_resultados.pack(pady=(10,10))
+frame_resultados.pack(pady=(10,10),fill="y",expand=True)
 
     ###Labels de Resultados
 label_raiz = tb.Label(frame_resultados, text="Raíz encontrada: ", width=95, font=("Segoe UI",12))
-label_raiz.pack(pady=10, padx=10)
+label_raiz.pack(pady=5, padx=10)
 
 label_iters = tb.Label(frame_resultados, text="Iteraciones: ", width=95, font=("Segoe UI",12))
-label_iters.pack(pady=10, padx=10)
+label_iters.pack(pady=5, padx=10)
 
-label_hist = tb.Label(frame_resultados, text="Historial: ", width=95, font=("Segoe UI",12), anchor="w", justify="left")
-label_hist.pack(pady=10, padx=10)
+tb.Label(frame_resultados,text="Historial: ", width=95, font=("Segoe UI",12)).pack(pady=10,padx=10)
 
-def mostrar_campos_para_metodo(metodo):
+label_hist = tb.Label(frame_resultados, width=95,font=("Courier", 10), anchor="w", justify="left")
+label_hist.pack(pady=2, padx=10,fill="y", expand=True)
+
+def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
     # Ocultar todas las entradas
     global metodo_seleccionado
     metodo_seleccionado = metodo
@@ -257,12 +293,12 @@ def mostrar_campos_para_metodo(metodo):
         entrada_x1.config(state="normal",bootstyle="light")
         entrada_tol.config(state="normal",bootstyle="light")
         entrada_max_iter.config(state="normal",bootstyle="light")
+
+
 """
 Raíces Encontrdas: 
 Iteraciones:
 calculos realizados:
 Historial:
 """
-
-
 ventana.mainloop()
