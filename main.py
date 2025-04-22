@@ -1,5 +1,6 @@
 import ttkbootstrap as tb
 from tkinter import font
+import math
 import numpy as np
 from methods.bisection import bisection
 from methods.newton import newton
@@ -130,7 +131,7 @@ def calcular_resultado():
             raiz, iters, hist = bisection(f, a, b, tol, iter_max)
 
         elif metodo_seleccionado == "Regula Falsi":
-            f = lambda x: eval(entrada_fun1.get())
+            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
             a = float(entrada_a.get())
             b = float(entrada_b.get())
             raiz, iters, hist = regula_falsi(f, a, b, tol, iter_max)
@@ -176,6 +177,7 @@ def calcular_resultado():
         from tkinter import messagebox
         messagebox.showerror("Error", str(e))
 
+
 #####FRAME PARA Botones Calcular y limpiar
 frame_calc_limp=tb.Frame(ventana,width=1050)
 frame_calc_limp.pack(pady=20)
@@ -192,12 +194,14 @@ frame_resultados=tb.LabelFrame(ventana,bootstyle="light",width=1050,height=200,t
 frame_resultados.pack(pady=(10,10))
 
     ###Labels de Resultados
-tb.Label(frame_resultados,text="Raíces Encontradas: ",width=95,font=("Segoe UI",12)).pack(pady=10,padx=10)
+label_raiz = tb.Label(frame_resultados, text="Raíz encontrada: ", width=95, font=("Segoe UI",12))
+label_raiz.pack(pady=10, padx=10)
 
-tb.Label(frame_resultados,text="Iteraciones: ",width=95,font=("Segoe UI",12)).pack(pady=10,padx=10)
+label_iters = tb.Label(frame_resultados, text="Iteraciones: ", width=95, font=("Segoe UI",12))
+label_iters.pack(pady=10, padx=10)
 
-tb.Label(frame_resultados,text="Historial: ",width=95,font=("Segoe UI",12)).pack(pady=10,padx=10)
-
+label_hist = tb.Label(frame_resultados, text="Historial: ", width=95, font=("Segoe UI",12), anchor="w", justify="left")
+label_hist.pack(pady=10, padx=10)
 
 def mostrar_campos_para_metodo(metodo):
     # Ocultar todas las entradas
