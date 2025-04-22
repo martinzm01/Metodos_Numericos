@@ -1,5 +1,16 @@
 import ttkbootstrap as tb
 from tkinter import font
+import numpy as np
+from methods.bisection import bisection
+from methods.newton import newton
+from methods.regula_falsi import regula_falsi
+from methods.secant import secant
+from methods.gauss_jordan import gauss_jordan
+from methods.jacobi import jacobi
+from methods.gauss_seidel import gauss_seidel
+
+metodo_seleccionado = None
+
     
 
 
@@ -105,12 +116,71 @@ def limpiar_entradas():
     ]
     for e in entradas:
         e.delete(0, 'end')
+        
+def calcular_resultado():
+    global metodo_seleccionado
+    try:
+        tol = float(entrada_tol.get())
+        iter_max = int(entrada_max_iter.get())
+
+        if metodo_seleccionado == "Biseccion":
+            f = lambda x: eval(entrada_fun1.get())
+            a = float(entrada_a.get())
+            b = float(entrada_b.get())
+            raiz, iters, hist = bisection(f, a, b, tol, iter_max)
+
+        elif metodo_seleccionado == "Regula Falsi":
+            f = lambda x: eval(entrada_fun1.get())
+            a = float(entrada_a.get())
+            b = float(entrada_b.get())
+            raiz, iters, hist = regula_falsi(f, a, b, tol, iter_max)
+
+        elif metodo_seleccionado == "Newton":
+            f = lambda x: eval(entrada_fun1.get())
+            df = lambda x: eval(entrada_fun2.get())
+            x0 = float(entrada_x0.get())
+            raiz, iters, hist = newton(f, df, x0, tol, iter_max)
+
+        elif metodo_seleccionado == "Secante":
+            f = lambda x: eval(entrada_fun1.get())
+            x0 = float(entrada_x0.get())
+            x1 = float(entrada_x1.get())
+            raiz, iters, hist = secant(f, x0, x1, tol, iter_max)
+
+        elif metodo_seleccionado == "Jacobi":
+            A = np.array(eval(entrada_fun1.get()))
+            b = np.array(eval(entrada_fun2.get()))
+            x, iters, hist = jacobi(A, b, tol=tol, max_iter=iter_max)
+            raiz = x
+
+        elif metodo_seleccionado == "Gauss-Jordan":
+            A = np.array(eval(entrada_fun1.get()))
+            b = np.array(eval(entrada_fun2.get()))
+            x = gauss_jordan(A, b)
+            raiz = x
+            iters = "-"
+            hist = []
+
+        elif metodo_seleccionado == "Gauss-Seidel":
+            A = np.array(eval(entrada_fun1.get()))
+            b = np.array(eval(entrada_fun2.get()))
+            x, iters, hist = gauss_seidel(A, b, tol=tol, max_iter=iter_max)
+            raiz = x
+
+        # Mostrar resultados
+        print("Raíz encontrada:", raiz)
+        print("Iteraciones:", iters)
+        print("Historial:", hist)
+
+    except Exception as e:
+        from tkinter import messagebox
+        messagebox.showerror("Error", str(e))
 
 #####FRAME PARA Botones Calcular y limpiar
 frame_calc_limp=tb.Frame(ventana,width=1050)
 frame_calc_limp.pack(pady=20)
     ##boton Calcular
-tb.Button(frame_calc_limp,text="CALCULAR",width=30).pack(padx=50,side="left")
+tb.Button(frame_calc_limp, text="CALCULAR", width=30, command=calcular_resultado).pack(padx=50, side="left")
     ##boton limpiar
 tb.Button(frame_calc_limp,text="LIMPIAR",width=30,command=limpiar_entradas).pack(padx=50,side="left")
 ## FUNCION PARA LIMPIAR ENTRADAS Y RESULTADOS
@@ -131,6 +201,8 @@ tb.Label(frame_resultados,text="Historial: ",width=95,font=("Segoe UI",12)).pack
 
 def mostrar_campos_para_metodo(metodo):
     # Ocultar todas las entradas
+    global metodo_seleccionado
+    metodo_seleccionado = metodo
     entradas = [entrada_fun1, entrada_fun2,entrada_fun3,entrada_fun4,entrada_fun5,entrada_fun6, entrada_a, entrada_b, entrada_x0, entrada_x1, entrada_tol, entrada_max_iter]
     for e in entradas:
         e.config(state='disabled')
