@@ -125,7 +125,7 @@ def calcular_resultado():
         iter_max = int(entrada_max_iter.get())
 
         if metodo_seleccionado == "Biseccion":
-            f = lambda x: eval(entrada_fun1.get())
+            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
             a = float(entrada_a.get())
             b = float(entrada_b.get())
             raiz, iters, hist = bisection(f, a, b, tol, iter_max)
@@ -137,13 +137,13 @@ def calcular_resultado():
             raiz, iters, hist = regula_falsi(f, a, b, tol, iter_max)
 
         elif metodo_seleccionado == "Newton":
-            f = lambda x: eval(entrada_fun1.get())
+            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
             df = lambda x: eval(entrada_fun2.get())
             x0 = float(entrada_x0.get())
             raiz, iters, hist = newton(f, df, x0, tol, iter_max)
 
         elif metodo_seleccionado == "Secante":
-            f = lambda x: eval(entrada_fun1.get())
+            f = lambda x: eval(entrada_fun1.get(), {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
             x0 = float(entrada_x0.get())
             x1 = float(entrada_x1.get())
             raiz, iters, hist = secant(f, x0, x1, tol, iter_max)
