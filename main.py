@@ -112,14 +112,17 @@ tb.Label(frame_Entrada,font=("Segoe UI",14),width=15).grid(row=6,column=2,pady=0
 
 
             ####   METODOS Y FUNCIONES  ######
-def limpiar_entradas():
+def limpiar_entradas_resultados():
     entradas = [
         entrada_fun1,entrada_fun2,entrada_fun3,entrada_fun4,entrada_fun5,entrada_fun6, entrada_a, entrada_b,
         entrada_x0, entrada_x1, entrada_tol, entrada_max_iter
     ]
     for e in entradas:
         e.delete(0, 'end')
-        
+    label_hist.config(text="")
+    label_raiz.config(text="Raíz encontrada: ")
+    label_iters.config(text="Iteraciones: ")    
+    
 def calcular_resultado():
     global metodo_seleccionado
     try:
@@ -198,7 +201,7 @@ frame_calc_limp.pack(pady=20)
     ##boton Calcular
 tb.Button(frame_calc_limp, text="CALCULAR", width=30, command=calcular_resultado).pack(padx=50, side="left")
     ##boton limpiar
-tb.Button(frame_calc_limp,text="LIMPIAR",width=30,command=limpiar_entradas).pack(padx=50,side="left")
+tb.Button(frame_calc_limp,text="LIMPIAR",width=30,command=limpiar_entradas_resultados).pack(padx=50,side="left")
 ## FUNCION PARA LIMPIAR ENTRADAS Y RESULTADOS
 
 
