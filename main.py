@@ -200,6 +200,8 @@ def calcular_resultado():
             sol_text = ", ".join(f"{n}={val:.6f}" for n, val in zip(nombres, x))
             label_raiz.config(text=f"Vector solución:\n{sol_text}")
 
+            historial_str = ""
+
         else:
             raise ValueError("Método no soportado")
 
@@ -221,6 +223,7 @@ def calcular_resultado():
             label_hist.config(text="")
             label_iters.config(text="")
             label_historial.config(text="")
+            historial_str = ""
         else:
             # Historial de métodos escalares (bisección, secante...)
             historial_str = "Iter |    a     |    b     |    c     |  f(c)\n"
