@@ -282,7 +282,6 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
         entrada_tol.config(state='normal',bootstyle="light")
         entrada_max_iter.config(state='normal',bootstyle="light")
 
-
     elif metodo == "Newton":
         entrada_fun1.config(state='normal',bootstyle="light")
         entrada_fun2.config(state='normal',bootstyle="light")
@@ -306,9 +305,7 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
         entrada_fun6.config(state='normal',bootstyle="light")  
         entrada_max_iter.config(state='normal',bootstyle="light")
         entrada_tol.config(state='normal',bootstyle="light")
-        entrada_a.config(state='normal',bootstyle="light")  
-        entrada_b.config(state='normal',bootstyle="light") 
-  
+
     elif metodo == "Gauss-Jordan":
         entrada_fun1.config(state='normal',bootstyle="light")  
         entrada_fun2.config(state='normal',bootstyle="light")  
@@ -323,5 +320,10 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
         entrada_max_iter.config(state="normal",bootstyle="light")
 
 
-
+"""
+Raíces Encontrdas: 
+Iteraciones:
+calculos realizados:
+Historial:
+"""
 ventana.mainloop()
