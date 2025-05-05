@@ -1,4 +1,6 @@
 import math
+from tkinter import Text, Scrollbar, RIGHT, Y, END
+import tkinter as tk
 from tkinter import messagebox
 import ttkbootstrap as tb
 from tkinter import font
@@ -18,11 +20,26 @@ metodo_seleccionado = None
 ventana=tb.Window(themename="vapor")
 ventana.geometry("1200x900")
 
-##Marco de titulo
+temas_disponibles = [
+    "vapor", "darkly", "superhero", "cyborg", "solar", "pulse"]
+
+def cambiar_tema(event):
+    nuevo_tema = combo_temas.get()
+    ventana.style.theme_use(nuevo_tema)
+    return nuevo_tema
+
+##Marco de titulo y temas
 Frame_titulo =tb.Frame(ventana,height=220)
 Frame_titulo.pack(pady=30,fill="x")
 label_titulo=tb.Label(Frame_titulo,text="Raíces y Soluciones",bootstyle="default",font=("Segoe UI",27,"bold"))
-label_titulo.pack()
+label_titulo.pack(side="bottom")
+####cambiar temas
+combo_temas = tb.Combobox(Frame_titulo, values=temas_disponibles, width=10, bootstyle="success")
+combo_temas.set("vapor")  # Tema inicial
+tema_actual=ventana.style.theme_use()
+combo_temas.pack(side="right")
+tb.Label(Frame_titulo, text="Selecciona Tema:", font=("Segoe UI",12)).pack(side="right", padx=5)
+combo_temas.bind("<<ComboboxSelected>>", cambiar_tema)
 
 # Definir fuente personalizada
 fuente_titulo = font.Font(family="Segoe UI", size=25, weight="bold")
@@ -133,9 +150,12 @@ def limpiar_entradas_resultados():
     ]
     for e in entradas:
         e.delete(0, 'end')
-    label_hist.config(text="")
-    label_raiz.config(text="Raíz encontrada: ")
-    label_iters.config(text="Iteraciones: ")    
+
+    label_raiz.config(text="Solución: ")
+    label_iters.config(text="Iteraciones: ")
+    label_historial.config(text="Historial: ")
+    text_hist.config(text="")
+
 
 def calcular_resultado():
     global metodo_seleccionado
@@ -200,8 +220,6 @@ def calcular_resultado():
             sol_text = ", ".join(f"{n}={val:.6f}" for n, val in zip(nombres, x))
             label_raiz.config(text=f"Vector solución:\n{sol_text}")
 
-            historial_str = ""
-
         else:
             raise ValueError("Método no soportado")
 
@@ -220,10 +238,10 @@ def calcular_resultado():
                 vals = " | ".join(f"{v:>10.6f}" for v in vec)
                 historial_str += f"{idx+1:>4} | {vals}\n"
         elif metodo_seleccionado=="Gauss-Jordan":
-            label_hist.config(text="")
             label_iters.config(text="")
             label_historial.config(text="")
             historial_str = ""
+
         else:
             # Historial de métodos escalares (bisección, secante...)
             historial_str = "Iter |    a     |    b     |    c     |  f(c)\n"
@@ -232,7 +250,8 @@ def calcular_resultado():
                 i, a_val, b_val, c_val, fc_val = paso
                 historial_str += f"{i:>4} | {a_val:>7.5f} | {b_val:>7.5f} | {c_val:>7.5f} | {fc_val:>7.5f}\n"
 
-        label_hist.config(text=historial_str)
+        text_hist.delete("1.0", END)
+        text_hist.insert("1.0", historial_str)
 
     except Exception as e:
         from tkinter import messagebox
@@ -249,23 +268,30 @@ tb.Button(frame_calc_limp,text="LIMPIAR",width=30,command=limpiar_entradas_resul
 ## FUNCION PARA LIMPIAR ENTRADAS Y RESULTADOS
 
 
-###Marco de Resultados
 
-frame_resultados=tb.LabelFrame(ventana,bootstyle="light",width=1050,height=200,text="RESULTADOS",style="Custom.TLabelframe")
-frame_resultados.pack(pady=(10,10),fill="y",expand=True)
+frame_resultados = tb.LabelFrame(ventana, bootstyle="light", width=1050, height=200, text="RESULTADOS", style="Custom.TLabelframe")
+frame_resultados.pack(pady=(10, 10), fill="y", expand=True)
 
-    ###Labels de Resultados
-label_raiz = tb.Label(frame_resultados, text="Solución: ", width=95, font=("Segoe UI",12))
+# Labels de resultados
+label_raiz = tb.Label(frame_resultados, text="Solución: ", width=95, font=("Segoe UI", 12))
 label_raiz.pack(pady=5, padx=10)
 
-label_iters = tb.Label(frame_resultados, text="Iteraciones: ", width=95, font=("Segoe UI",12))
-label_iters.pack(pady=5, padx=10)
+label_iters = tb.Label(frame_resultados, text="Iteraciones: ", width=95, font=("Segoe UI", 12))
+label_iters.pack(pady=(0,0), padx=10)
 
-label_historial=tb.Label(frame_resultados,text="Historial: ", width=95, font=("Segoe UI",12))
-label_historial.pack(pady=10,padx=10)
+label_historial = tb.Label(frame_resultados, text="Historial: ", font=("Segoe UI", 12))
+label_historial.pack(pady=(0,0),padx=10, side="left")
 
-label_hist = tb.Label(frame_resultados, width=95,font=("Courier", 10), anchor="w", justify="left")
-label_hist.pack(pady=2, padx=10,fill="y", expand=True)
+# Frame para historial con scrollbar
+frame_hist = tb.Frame(frame_resultados)
+frame_hist.pack(padx=10, pady=(15,0), fill="y", expand=True,side="left")
+
+scrollbar = Scrollbar(frame_hist)
+scrollbar.pack(side=RIGHT, fill=Y)
+
+text_hist = Text(frame_hist, font=("Courier", 10), wrap="none", yscrollcommand=scrollbar.set, height=8)
+text_hist.pack(fill="y", expand=True)
+scrollbar.config(command=text_hist.yview)
 
 def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
     # Ocultar todas las entradas
@@ -279,54 +305,83 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
 
     # Mostrar solo los que necesita ese método
     if metodo == "Biseccion":
-        entrada_fun1.config(state='normal',bootstyle="light")
-        entrada_a.config(state='normal',bootstyle="light")
-        entrada_b.config(state='normal',bootstyle="light")
-        entrada_tol.config(state='normal',bootstyle="light")
-        entrada_max_iter.config(state='normal',bootstyle="light")
+        if (ventana.style.theme_use()!="pulse"):
+
+            entrada_fun1.config(state='normal',bootstyle="light")
+            entrada_a.config(state='normal',bootstyle="light")
+            entrada_b.config(state='normal',bootstyle="light")
+            entrada_tol.config(state='normal',bootstyle="light")
+            entrada_max_iter.config(state='normal',bootstyle="light")
+        else:
+            entrada_fun1.config(state='normal',bootstyle="dark")
+            entrada_a.config(state='normal',bootstyle="dark")
+            entrada_b.config(state='normal',bootstyle="dark")
+            entrada_tol.config(state='normal',bootstyle="dark")
+            entrada_max_iter.config(state='normal',bootstyle="dark")
 
     elif metodo == "Newton":
-        entrada_fun1.config(state='normal',bootstyle="light")
-        entrada_fun2.config(state='normal',bootstyle="light")
-        entrada_x0.config(state='normal',bootstyle="light")
-        entrada_tol.config(state='normal',bootstyle="light")
-        entrada_max_iter.config(state='normal',bootstyle="light")
-
+        if (ventana.style.theme_use()!="pulse"):
+            entrada_fun1.config(state='normal',bootstyle="light")
+            entrada_fun2.config(state='normal',bootstyle="light")
+            entrada_x0.config(state='normal',bootstyle="light")
+            entrada_tol.config(state='normal',bootstyle="light")
+            entrada_max_iter.config(state='normal',bootstyle="light")
+        else:
+            entrada_fun1.config(state='normal',bootstyle="dark")
+            entrada_fun2.config(state='normal',bootstyle="dark")
+            entrada_x0.config(state='normal',bootstyle="dark")
+            entrada_tol.config(state='normal',bootstyle="dark")
+            entrada_max_iter.config(state='normal',bootstyle="dark")
+    
     elif metodo == "Regula Falsi":
-        entrada_fun1.config(state='normal',bootstyle="light")
-        entrada_a.config(state='normal',bootstyle="light")
-        entrada_b.config(state='normal',bootstyle="light")
-        entrada_tol.config(state='normal',bootstyle="light")
-        entrada_max_iter.config(state='normal',bootstyle="light")
-
+        if (ventana.style.theme_use()!="pulse"):
+            entrada_fun1.config(state='normal',bootstyle="light")
+            entrada_a.config(state='normal',bootstyle="light")
+            entrada_b.config(state='normal',bootstyle="light")
+            entrada_tol.config(state='normal',bootstyle="light")
+            entrada_max_iter.config(state='normal',bootstyle="light")
+        else:
+            entrada_fun1.config(state='normal',bootstyle="dark")
+            entrada_a.config(state='normal',bootstyle="dark")
+            entrada_b.config(state='normal',bootstyle="dark")
+            entrada_tol.config(state='normal',bootstyle="dark")
+            entrada_max_iter.config(state='normal',bootstyle="dark")
+            
     elif metodo == "Jacobi" or metodo == "Gauss-Seidel":
-        entrada_fun1.config(state='normal',bootstyle="light")  
-        entrada_fun2.config(state='normal',bootstyle="light")  
-        entrada_fun3.config(state='normal',bootstyle="light")  
-        entrada_fun4.config(state='normal',bootstyle="light")  
-        entrada_fun5.config(state='normal',bootstyle="light")  
-        entrada_fun6.config(state='normal',bootstyle="light")  
-        entrada_max_iter.config(state='normal',bootstyle="light")
-        entrada_tol.config(state='normal',bootstyle="light")
+        if (ventana.style.theme_use()!="pulse"):
+            entrada_fun1.config(state='normal',bootstyle="light")  
+            entrada_fun2.config(state='normal',bootstyle="light")  
+            entrada_max_iter.config(state='normal',bootstyle="light")
+            entrada_tol.config(state='normal',bootstyle="light")
+        else:
+            entrada_fun1.config(state='normal',bootstyle="dark")  
+            entrada_fun2.config(state='normal',bootstyle="dark")  
+            entrada_max_iter.config(state='normal',bootstyle="dark")
+            entrada_tol.config(state='normal',bootstyle="dark")
 
     elif metodo == "Gauss-Jordan":
-        entrada_fun1.config(state='normal',bootstyle="light")  
-        entrada_fun2.config(state='normal',bootstyle="light")  
-        entrada_max_iter.config(state='normal',bootstyle="light")
-        entrada_tol.config(state='normal',bootstyle="light")
-
+        if (ventana.style.theme_use()!="pulse"):
+            entrada_fun1.config(state='normal',bootstyle="light")  
+            entrada_fun2.config(state='normal',bootstyle="light")  
+            entrada_max_iter.config(state='normal',bootstyle="light")
+            entrada_tol.config(state='normal',bootstyle="light")
+        else:
+            entrada_fun1.config(state='normal',bootstyle="dark")  
+            entrada_fun2.config(state='normal',bootstyle="dark")  
+            entrada_max_iter.config(state='normal',bootstyle="dark")
+            entrada_tol.config(state='normal',bootstyle="dark")
     elif metodo=="Secante":
-        entrada_fun1.config(state="normal",bootstyle="light")
-        entrada_x0.config(state="normal",bootstyle="light")
-        entrada_x1.config(state="normal",bootstyle="light")
-        entrada_tol.config(state="normal",bootstyle="light")
-        entrada_max_iter.config(state="normal",bootstyle="light")
+        if (ventana.style.theme_use()!="pulse"):
+            entrada_fun1.config(state="normal",bootstyle="light")
+            entrada_x0.config(state="normal",bootstyle="light")
+            entrada_x1.config(state="normal",bootstyle="light")
+            entrada_tol.config(state="normal",bootstyle="light")
+            entrada_max_iter.config(state="normal",bootstyle="light")
+        else:
+            entrada_fun1.config(state="normal",bootstyle="dark")
+            entrada_x0.config(state="normal",bootstyle="dark")
+            entrada_x1.config(state="normal",bootstyle="dark")
+            entrada_tol.config(state="normal",bootstyle="dark")
+            entrada_max_iter.config(state="normal",bootstyle="dark")
 
-
-"""
-Raíces Encontrdas: 
-Iteraciones:
-calculos realizados:
-Historial:
-"""
 ventana.mainloop()
