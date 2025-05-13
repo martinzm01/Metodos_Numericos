@@ -19,6 +19,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 metodo_seleccionado = None
 ventana=tb.Window(themename="vapor")
@@ -257,6 +258,8 @@ def limpiar_entradas_resultados():
     canvas.get_tk_widget().pack(pady=1)
 
 
+
+
 def calcular_resultado():
     global metodo_seleccionado
     try:
@@ -323,14 +326,30 @@ def calcular_resultado():
                 ax.grid(True, color="#444444")
                 ax.legend(facecolor="#333333", edgecolor="white", labelcolor="white")
                 
+                
 
-                # Eliminar solo el canvas anterior, si existe
+                """  ANTES
+                # Eliminar solo el canvas anterior, si existe               
                 for widget in frame_graficadora.winfo_children():
                     widget.destroy()
 
                 canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
                 canvas.draw()
                 canvas.get_tk_widget().pack(pady=1)
+                """
+                #--------------DESPUES-----------------
+                for widget in frame_graficadora.winfo_children():
+                    widget.destroy()
+                canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
+                canvas.draw()
+                canvas_widget = canvas.get_tk_widget()
+                canvas_widget.pack(side="top", fill="both", expand=True)
+
+                # Agregar barra de navegación
+                toolbar = NavigationToolbar2Tk(canvas, frame_graficadora)
+                toolbar.update()
+                toolbar.pack(side=tk.TOP, fill=tk.X)
+
 
 
             else:
@@ -365,14 +384,30 @@ def calcular_resultado():
                 ax.grid(True, color="#444444")
                 ax.legend(facecolor="#333333", edgecolor="white", labelcolor="white")
                 
-
-                # Eliminar solo el canvas anterior, si existe
+                """  ANTES
+                # Eliminar solo el canvas anterior, si existe               
                 for widget in frame_graficadora.winfo_children():
                     widget.destroy()
 
                 canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
                 canvas.draw()
                 canvas.get_tk_widget().pack(pady=1)
+                """
+
+
+                # Eliminar solo el canvas anterior, si existe
+                for widget in frame_graficadora.winfo_children():
+                    widget.destroy()
+                canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
+                canvas.draw()
+                canvas_widget = canvas.get_tk_widget()
+                canvas_widget.pack(side="top", fill="both", expand=True)
+
+                # Agregar barra de navegación
+                toolbar = NavigationToolbar2Tk(canvas, frame_graficadora)
+                toolbar.update()
+                toolbar.pack(side=tk.TOP, fill=tk.X)
+
 
         elif metodo_seleccionado == "Graficar":  
             if ventana.style.theme_use()=="cyborg":
@@ -392,8 +427,10 @@ def calcular_resultado():
 
                 
                 ax.xaxis.set_major_locator(MaxNLocator(nbins=10))
-                ax.set_xlim(lim_inf_x, lim_sup_x)
-                ax.set_ylim(lim_inf_y,lim_sup_y)
+                #ax.set_xlim(lim_inf_x, lim_sup_x)
+                #ax.set_ylim(lim_inf_y,lim_sup_y)
+                ax.relim()
+                ax.autoscale_view()
 
                 ax.tick_params(colors='white')
                 ax.spines['bottom'].set_color('#7BFFF8')
@@ -408,15 +445,27 @@ def calcular_resultado():
                 ax.grid(True, color="#444444")
                 ax.legend(facecolor="#333333", edgecolor="white", labelcolor="white")
                 
-
+                
                 # Eliminar solo el canvas anterior, si existe
                 for widget in frame_graficadora.winfo_children():
                     widget.destroy()
 
-                canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
-                canvas.draw()
-                canvas.get_tk_widget().pack(pady=1)
+                """ANTES
+                #canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
+                #canvas.draw()
+                #canvas.get_tk_widget().pack(pady=1)
+                """
 
+                canvas = FigureCanvasTkAgg(fig, master=frame_graficadora) 
+                canvas.draw()
+                canvas_widget = canvas.get_tk_widget()
+                canvas_widget.pack(side="top", fill="both", expand=True)
+
+                # Agregar barra de navegación (zoom)
+                toolbar = NavigationToolbar2Tk(canvas, frame_graficadora)
+                toolbar.update()
+                toolbar.pack(side=tk.TOP, fill=tk.X)
+                
             else:
                 lim_inf_x, lim_sup_x = float(entrada_a.get()), float(entrada_b.get())
                 lim_inf_y,lim_sup_y=float(entrada_x0.get()), float(entrada_x1.get())
@@ -451,13 +500,27 @@ def calcular_resultado():
                 ax.legend(facecolor="#333333", edgecolor="white", labelcolor="white")
                 
 
+
                 # Eliminar solo el canvas anterior, si existe
                 for widget in frame_graficadora.winfo_children():
                     widget.destroy()
 
+                """"ANTES
+                #canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
+                #canvas.draw()
+                #canvas.get_tk_widget().pack(pady=1)
+                """""
                 canvas = FigureCanvasTkAgg(fig, master=frame_graficadora)
                 canvas.draw()
-                canvas.get_tk_widget().pack(pady=1)
+                canvas_widget = canvas.get_tk_widget()
+                canvas_widget.pack(side="top", fill="both", expand=True)
+
+                # Agregar barra de navegación
+                toolbar = NavigationToolbar2Tk(canvas, frame_graficadora)
+                toolbar.update()
+                toolbar.pack(side=tk.TOP, fill=tk.X)
+
+
         ###METODOS DE SISTEMAS LINEALES
 
         elif metodo_seleccionado in ["Jacobi", "Gauss-Seidel"]:
