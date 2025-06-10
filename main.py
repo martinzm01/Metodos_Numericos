@@ -15,6 +15,9 @@ from metodosnumericos.gauss_jordan import gauss_jordan
 from metodosnumericos.regula_falsi import regula_falsi 
 from metodosnumericos.jacobi import jacobi
 from metodosnumericos.gauss_seidel import gauss_seidel
+from metodosnumericos.simpson import regla_simpson
+from metodosnumericos.trapecio import regla_trapecio
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -22,7 +25,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
 metodo_seleccionado = None
-ventana=tb.Window(themename="vapor")
+ventana=tb.Window(themename="cyborg")
 ventana.geometry("1920x1080")
 ventana.title("MetodosNumericos")
 temas_disponibles = ["vapor", "cyborg", "solar"]
@@ -44,7 +47,7 @@ def cambiar_tema(event):
 
 ####cambiar temas
 combo_temas = tb.Combobox(Frame_titulo, values=temas_disponibles, width=10, bootstyle="success")
-combo_temas.set("vapor")  # Tema inicial
+combo_temas.set("cyborg")  # Tema inicial
 tema_actual=ventana.style.theme_use()
 combo_temas.pack(side="right",pady=(20,0),padx=10)
 tb.Label(Frame_titulo, text="Selecciona Tema:", font=("Segoe UI",12)).pack(side="right", padx=5,pady=(20,0))
@@ -78,7 +81,7 @@ frame_derecha_inferior.pack(expand=True,fill="both")
 ##Marco de Metodos
 
 frame_metodos=tb.Frame(frame_izquierda,padding=(40,20,40,20),style="Custom.TLabelframe") ###izq /arriba / der/ abajo
-frame_metodos.grid(row=0,pady=30,padx=1)
+frame_metodos.grid(row=0,pady=(40,20),padx=1)
 
 label_selecMetodo=tb.Label(frame_metodos,text="Seleccion del Método            ",font=("Segoe UI",16)).grid(row=0,column=0,pady=10,padx=0)
 
@@ -88,8 +91,11 @@ boton_regula_falsi=tb.Button(frame_metodos,width=40,text="Regula Falsi",bootstyl
 boton_jacobi=tb.Button(frame_metodos,width=40,text="Jacobi",bootstyle="secondary", command=lambda: mostrar_campos_para_metodo("Jacobi"))
 boton_secante=tb.Button(frame_metodos,width=40,text="Secante",bootstyle="success", command=lambda: mostrar_campos_para_metodo("Secante"))
 boton_gauss_jordan=tb.Button(frame_metodos,width=40,text="Gauss-Jordan",bootstyle="danger", command=lambda: mostrar_campos_para_metodo("Gauss-Jordan"))
-boton_gauss_seidel=tb.Button(frame_metodos,width=40,text="Gauss-Seidel",bootstyle="light", command=lambda: mostrar_campos_para_metodo("Gauss-Seidel"))
+boton_gauss_seidel=tb.Button(frame_metodos,width=40,text="Runge_Kutta",bootstyle="light", command=lambda: mostrar_campos_para_metodo("Gauss-Seidel"))
 boton_graficar=tb.Button(frame_metodos,width=40,text="Graficar",bootstyle="bg", command=lambda: mostrar_campos_para_metodo("Graficar"))
+boton_trapecio=tb.Button(frame_metodos,width=40,text="Integracion-Regla del Trapecio",bootstyle="info", command=lambda: mostrar_campos_para_metodo("Trapecio"))
+boton_simpson=tb.Button(frame_metodos,width=40,text="Integracion-Simpson",bootstyle="warning", command=lambda: mostrar_campos_para_metodo("Simpson"))
+
 
 boton_biseccion.grid(row=1,column=0,pady=10,padx=20)
 boton_newton.grid(row=1,column=1, pady=10)
@@ -99,6 +105,8 @@ boton_secante.grid(row=3,column=0,padx=20,pady=(10,20))
 boton_gauss_jordan.grid(row=3,column=1,padx=10,pady=(10,20))
 boton_gauss_seidel.grid(row=4,column=0,padx=10,pady=(10,20))
 boton_graficar.grid(row=4,column=1,padx=10,pady=(10,20))
+boton_trapecio.grid(row=5,column=0,padx=10,pady=(10,20))
+boton_simpson.grid(row=5,column=1,padx=10,pady=(10,20))
 
 ####comnetarios sobre los botones
 ToolTip(boton_biseccion, text="Encuentra raíces - Para Funciones no lineales ")
@@ -109,11 +117,12 @@ ToolTip(boton_secante, text="Ecuentra raíces de una funcion no lineal - Aproxim
 ToolTip(boton_gauss_jordan, text="Algoritmo directo para resolver sistemas lineales.")
 ToolTip(boton_gauss_seidel, text="método iterativo para resolver sistemas de ecuaciones lineales del tipo: ax=b")
 ToolTip(boton_graficar, text="Grafica cualquier función f(x)=y")
-
+ToolTip(boton_trapecio, text="Aproxima el área bajo la curva como un trapecio, usando solo los extremos del intervalo")
+ToolTip(boton_simpson, text="Aproxima la integral con un parábola (polinomio de grado 2) que pasa por tres puntos.")
 
 
 ####### FRAME de DATOS DE ENTRADA
-frame_Entrada=tb.Frame(frame_izquierda,style="Custom.TLabelframe",padding=(52,0,52,50,))
+frame_Entrada=tb.Frame(frame_izquierda,style="Custom.TLabelframe",padding=(52,0,52,20))
 frame_Entrada.grid(row=1,pady=0)
     ###Label de la funcion
 label_fun1=tb.Label(frame_Entrada,font=("Segoe UI",14),text="f(x)")
@@ -168,7 +177,8 @@ label_tol.grid(row=4,column=3,padx=(10,10))
 entrada_tol=tb.Entry(frame_Entrada,width=20)
 entrada_tol.grid(row=4,column=4,padx=10)
 
-tb.Label(frame_Entrada,font=("Segoe UI",14),text="Iter").grid(row=5,column=3,padx=(10,10))
+label_iteraciones=tb.Label(frame_Entrada,font=("Segoe UI",14),text="Iter")
+label_iteraciones.grid(row=5,column=3,padx=(10,10))
 entrada_max_iter=tb.Entry(frame_Entrada,width=20)
 entrada_max_iter.grid(row=5,column=4,padx=10)
 
@@ -547,6 +557,37 @@ def calcular_resultado():
             label_raiz.config(text=f"Vector solución:\n{sol_text}")
 
 
+#######METODOS DE INTEGRACION
+        elif metodo_seleccionado in ["Trapecio", "Simpson"]:
+            try:
+                f = lambda x: eval(expresiones[0], {"x": x, "math": math, "sin": math.sin, "cos": math.cos, "exp": math.exp})
+                a = float(entrada_a.get().replace(",", "."))  # reemplaza coma por punto
+                b_ = float(entrada_b.get().replace(",", "."))
+                n = int(entrada_x0.get())
+            except ValueError:
+                messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos (a, b y n).")
+                return
+
+            if metodo_seleccionado == "Trapecio":
+                resultado = regla_trapecio(f, a, b_, n)
+                raiz = resultado
+                iters = "-"
+                hist = []
+                resultado_str = f"Área aproximada por el método del trapecio: {resultado:.6f}"
+                label_raiz.config(text=f"Área aproximada por el método del trapecio: {resultado:.6f}")
+                print(resultado_str)
+            elif metodo_seleccionado == "Simpson":
+                if n % 2 != 0:
+                    messagebox.showerror("Error", "Para Simpson, el número de subintervalos (n) debe ser par.")
+                    return
+                resultado = regla_simpson(f, a, b_, n)
+                raiz = resultado
+                iters = "-"
+                hist = []
+                resultado_str = f"Área aproximada por el método de Simpson: {resultado:.6f}"
+                label_raiz.config(text=f"Área aproximada por el método de Simpson: {resultado:.6f}")
+                print(resultado_str)
+
 
         else:
             raise ValueError("Método no soportado")
@@ -569,6 +610,8 @@ def calcular_resultado():
             historial_str = ""
         elif metodo_seleccionado=="Graficar":
             historial_str=""
+
+
         else:
             # Historial de métodos escalares (bisección, secante...)
             historial_str = "Iter |    a     |    b     |    c     |  f(c)\n"
@@ -749,8 +792,6 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
         if (ventana.style.theme_use()!="solar" ):
             entrada_fun1.config(state='normal',bootstyle="light")  
             entrada_fun2.config(state='normal',bootstyle="light")  
-            entrada_max_iter.config(state='normal',bootstyle="light")
-            entrada_tol.config(state='normal',bootstyle="light")
             label_a.config(text="A")
             label_b.config(text="B")
             label_x0.config(text="x0")
@@ -760,8 +801,6 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
         else:      
             entrada_fun1.config(state='normal',bootstyle="primary")  
             entrada_fun2.config(state='normal',bootstyle="primary")  
-            entrada_max_iter.config(state='normal',bootstyle="primary")
-            entrada_tol.config(state='normal',bootstyle="primary")
             label_a.config(text="A")
             label_b.config(text="B")
             label_x0.config(text="x0")
@@ -794,6 +833,55 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
             label_fun1.config(text="f(x)")
             label_fun2.config(text="")  
 
+    elif metodo=="Trapecio":
+        if (ventana.style.theme_use()!="solar"):
+            entrada_fun1.config(state='normal',bootstyle="light") 
+            entrada_a.config(state='normal',bootstyle="light")
+            entrada_b.config(state='normal',bootstyle="light")
+            entrada_x0.config(state="normal",bootstyle="light")
+            label_x0.config(text="n")
+            label_a.config(text="A")
+            label_b.config(text="B")
+            label_x1.config(text="")       
+            label_fun1.config(text="f(x)")
+            label_fun2.config(text="")  
+
+        else:
+            entrada_fun1.config(state='normal',bootstyle="primary")
+            entrada_a.config(state='normal',bootstyle="primary")
+            entrada_b.config(state='normal',bootstyle="primary")
+            entrada_x0.config(state="normal",bootstyle="primary")
+            label_x0.config(text="n")
+            label_a.config(text="A")
+            label_b.config(text="B")
+            label_x1.config(text="")       
+            label_fun1.config(text="f(x)")
+            label_fun2.config(text="")  
+
+    elif metodo=="Simpson":
+        if (ventana.style.theme_use()!="solar"):
+            entrada_fun1.config(state='normal',bootstyle="light") 
+            entrada_a.config(state='normal',bootstyle="light")
+            entrada_b.config(state='normal',bootstyle="light")
+            entrada_x0.config(state="normal",bootstyle="light")
+            label_x0.config(text="n")
+            label_a.config(text="A")
+            label_b.config(text="B")
+            label_x1.config(text="")       
+            label_fun1.config(text="f(x)")
+            label_fun2.config(text="")  
+
+        else:
+            entrada_fun1.config(state='normal',bootstyle="primary")
+            entrada_a.config(state='normal',bootstyle="primary")
+            entrada_b.config(state='normal',bootstyle="primary")
+            entrada_x0.config(state="normal",bootstyle="primary")
+            label_x0.config(text="n")
+            label_a.config(text="A")
+            label_b.config(text="B")
+            label_x1.config(text="")       
+            label_fun1.config(text="f(x)")
+            label_fun2.config(text="")
     else:
         if (ventana.style.theme_use()!="solar"):
             entrada_fun1.config(state='normal',bootstyle="light") 
@@ -821,6 +909,7 @@ def mostrar_campos_para_metodo(metodo): ###ocultar campos que no se necesitan
             label_fun1.config(text="f(x)")
             label_fun2.config(text="")  
 
+        
 
 
 
