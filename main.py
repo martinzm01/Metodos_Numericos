@@ -5,7 +5,10 @@ from tkinter import messagebox
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 from tkinter import font
+<<<<<<< HEAD
 import math
+=======
+>>>>>>> d06f54a (Cambio de la dimension de la ventana y cambio de rama)
 import numpy as np
 from ttkbootstrap.tooltip import ToolTip
 from metodosnumericos.bisection import bisection
@@ -15,22 +18,55 @@ from metodosnumericos.gauss_jordan import gauss_jordan
 from metodosnumericos.regula_falsi import regula_falsi 
 from metodosnumericos.jacobi import jacobi
 from metodosnumericos.gauss_seidel import gauss_seidel
+<<<<<<< HEAD
 from metodosnumericos.simpson import regla_simpson
 from metodosnumericos.trapecio import regla_trapecio
 
+=======
+>>>>>>> d06f54a (Cambio de la dimension de la ventana y cambio de rama)
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
+<<<<<<< HEAD
 
 metodo_seleccionado = None
 ventana=tb.Window(themename="cyborg")
 ventana.geometry("1920x1080")
 ventana.title("MetodosNumericos")
 temas_disponibles = ["vapor", "cyborg", "solar"]
+=======
+>>>>>>> d06f54a (Cambio de la dimension de la ventana y cambio de rama)
+
+metodo_seleccionado = None
+
+temas_disponibles = ["vapor", "cyborg", "solar"]
+
+<<<<<<< HEAD
+=======
+ventana=tb.Window(themename="vapor")
+# Obtener dimensiones de la pantalla
+ancho_pantalla = ventana.winfo_screenwidth()
+alto_pantalla = ventana.winfo_screenheight()
+
+ancho_ventana = int(ancho_pantalla * 0.9)
+alto_ventana = int(alto_pantalla * 0.9)
+
+pos_x = (ancho_pantalla - ancho_ventana) // 2
+pos_y = (alto_pantalla - alto_ventana) // 2
+
+ventana.geometry(f"{ancho_ventana}x{alto_ventana}+{pos_x}+{pos_y}")
+ventana.title("MetodosNumericos")
 
 
+
+##Marco de titulo y temas
+Frame_titulo =tb.Frame(ventana,padding=(0,0,0,0))
+Frame_titulo.pack(fill="both",expand=True)
+label_titulo=tb.Label(Frame_titulo,text="FX",bootstyle="default",font=("Segoe UI",40,"bold"),padding=(10,0,10,0))
+label_titulo.pack(side="bottom",pady=(0,0))
+>>>>>>> d06f54a (Cambio de la dimension de la ventana y cambio de rama)
 
 
 ##Marco de titulo y temas
